@@ -9,15 +9,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Mock DB connection if no URI provided
+// MongoDB connection
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGO_URI || 'mongodb+srv://hassan1244:hassan1244@cluster0.jtewbtt.mongodb.net/?appName=Cluster0';
+    const mongoURI = process.env.MONGO_URI;
+    if (!mongoURI) {
+      console.warn('MONGO_URI not set — skipping database connection.');
+      return;
+    }
     await mongoose.connect(mongoURI);
     console.log('MongoDB connection established successfully');
   } catch (error) {
     console.error('MongoDB connection failed:', error.message);
-    // Don't exit process in development, just log error
   }
 };
 
@@ -45,7 +48,18 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', environment: process.env.NODE_ENV || 'development' });
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
+// Root endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'ShopFlow API is running' });
 });
+
+// Only listen when running locally (not on Vercel)
+if (process.env.VERCEL !== '1') {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port: ${PORT}`);
+  });
+}
+
+// Export the app for Vercel serverless
+module.exports = app;
