@@ -12,7 +12,7 @@ app.use(express.json());
 // MongoDB connection
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGO_URI;
+    const mongoURI = "mongodb+srv://hassan1244:hassan1244@cluster0.jtewbtt.mongodb.net/?appName=Cluster0  " || process.env.MONGODB_URI;
     if (!mongoURI) {
       console.warn('MONGO_URI not set — skipping database connection.');
       return;
